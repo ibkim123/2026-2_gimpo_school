@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>김포미래그린공유학교 지역맞춤형프로그램 2학기 · 회차별 학습한 결과 제출 및 확인</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0A0D1C; --bg-1:#111633; --card:#151B3B; --card-border:#2A3266;
+    --text-0:#F1F3FC; --text-1:#A8AEDB; --text-2:#6C72A0;
+    --holo-a:#5EE7C7; --holo-b:#B48CFF; --holo-c:#FFC96B;
+    --ok:#5EE7C7; --err:#FF8A8A; --pending:#5C6294;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 0%, #1B2354 0%, transparent 45%),
+      radial-gradient(circle at 90% 10%, #241C4A 0%, transparent 40%),
+      var(--bg-0);
+    color:var(--text-0); font-family:'Inter',sans-serif;
+    padding:48px 20px 80px;
+  }
+  .wrap{max-width:1100px;margin:0 auto;}
+  .brand-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .brand-row img{height:26px;width:auto;border-radius:4px;display:block;}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--holo-a);font-weight:600;margin-bottom:10px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:700;margin:0 0 8px;line-height:1.2;}
+  .tagline{font-size:14px;font-weight:600;color:var(--holo-b);margin:0 0 14px;}
+  .sub{color:var(--text-1);font-size:14px;line-height:1.6;max-width:640px;margin:0 0 24px;}
+
+  .tabs{display:flex;gap:8px;margin-bottom:28px;border-bottom:1px solid var(--card-border);}
+  .tab-btn{
+    background:none;border:none;color:var(--text-2);font-size:14px;font-weight:500;
+    font-family:'Space Grotesk',sans-serif;padding:10px 4px;margin-right:20px;
+    cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;
+  }
+  .tab-btn.active{color:var(--text-0);border-color:var(--holo-a);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  /* ── 제출 폼 ── */
+  .form-wrap{max-width:520px;}
+  form{
+    position:relative;background:var(--card);border:1px solid var(--card-border);
+    border-radius:16px;padding:28px 24px;overflow:hidden;isolation:isolate;
+  }
+  form::before{
+    content:"";position:absolute;inset:0;
+    background:conic-gradient(from 180deg at 100% 0%, var(--holo-a), var(--holo-b), var(--holo-c), var(--holo-a));
+    opacity:.08;z-index:-1;
+  }
+  label{display:block;font-size:13px;font-weight:500;color:var(--text-1);margin:0 0 6px;}
+  .field{margin-bottom:18px;}
+  select, input[type="url"], input[type="password"]{
+    width:100%;background:rgba(255,255,255,.03);border:1px solid var(--card-border);
+    color:var(--text-0);font-size:14px;padding:11px 12px;border-radius:8px;
+    font-family:inherit;outline:none;transition:border-color .15s;
+  }
+  select:focus, input:focus{border-color:var(--holo-a);}
+  select option{background:#151B3B;color:#F1F3FC;}
+  select option:disabled{color:#6C72A0;}
+  .file-drop{
+    border:1px dashed var(--card-border);border-radius:8px;padding:20px 14px;
+    text-align:center;cursor:pointer;transition:border-color .15s,background .15s;
+    background:rgba(255,255,255,.02);
+  }
+  .file-drop:hover, .file-drop.drag{border-color:var(--holo-a);background:rgba(94,231,199,.05);}
+  .file-drop input{display:none;}
+  .file-drop .hint{font-size:12px;color:var(--text-2);margin-top:4px;}
+  .file-name{font-size:13px;color:var(--holo-a);margin-top:8px;word-break:break-all;}
+  button[type="submit"], button.secondary-btn{
+    width:100%;border:none;font-weight:700;font-size:14px;padding:13px;
+    border-radius:8px;cursor:pointer;font-family:'Space Grotesk',sans-serif;
+    margin-top:6px;transition:opacity .15s;
+  }
+  button[type="submit"]{background:linear-gradient(90deg,var(--holo-a),var(--holo-b));color:#0A0D1C;}
+  button:disabled{opacity:.5;cursor:not-allowed;}
+  button.secondary-btn{background:transparent;border:1px solid var(--card-border);color:var(--text-0);font-weight:500;}
+  #submit-status{margin-top:16px;font-size:13px;line-height:1.6;padding:10px 12px;border-radius:8px;display:none;}
+  #submit-status.show{display:block;}
+  #submit-status.ok{background:rgba(94,231,199,.1);color:var(--ok);border:1px solid rgba(94,231,199,.3);}
+  #submit-status.err{background:rgba(255,138,138,.1);color:var(--err);border:1px solid rgba(255,138,138,.3);}
+  #submit-status.loading{background:rgba(168,174,219,.1);color:var(--text-1);border:1px solid var(--card-border);}
+  .pw-toggle{font-size:12px;color:var(--holo-a);margin-top:8px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+  .pw-change{border:1px solid var(--card-border);border-radius:10px;padding:16px 14px 4px;margin-bottom:18px;background:rgba(255,255,255,.02);}
+
+  /* ── 결과 조회 ── */
+  .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--bg-1);border:1px solid var(--card-border);
+    color:var(--text-1);font-size:13px;padding:8px 14px;border-radius:999px;
+    text-decoration:none;transition:border-color .15s;cursor:pointer;
+  }
+  .pill:hover{border-color:var(--holo-a);color:var(--text-0);}
+  .pill svg{width:13px;height:13px;flex-shrink:0;}
+  #result-status{font-size:12px;color:var(--text-2);margin:0 0 24px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+  .card{
+    position:relative;background:var(--card);border:1px solid var(--card-border);
+    border-radius:14px;padding:20px 18px 18px;overflow:hidden;isolation:isolate;
+  }
+  .card::before{
+    content:"";position:absolute;inset:0;
+    background:conic-gradient(from 180deg at 100% 0%, var(--holo-a), var(--holo-b), var(--holo-c), var(--holo-a));
+    opacity:.10;z-index:-1;
+  }
+  .card::after{
+    content:"";position:absolute;top:-40%;right:-40%;width:120px;height:120px;
+    background:radial-gradient(circle, rgba(255,255,255,.18), transparent 70%);z-index:-1;
+  }
+  .num{font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--text-2);letter-spacing:.06em;}
+  .name{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;margin:2px 0 10px;}
+  .school{font-size:13px;color:var(--text-1);margin-bottom:6px;}
+  .progress{font-size:12px;color:var(--holo-a);margin-bottom:14px;}
+  .rounds{display:flex;flex-direction:column;gap:6px;}
+  .round-row{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 8px;border-radius:6px;background:rgba(255,255,255,.02);}
+  .round-label{width:38px;flex-shrink:0;color:var(--text-1);font-weight:500;}
+  .round-link{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;text-decoration:none;border:1px solid var(--card-border);color:var(--text-0);}
+  .round-link:hover{border-color:var(--holo-a);}
+  .round-link.empty{color:var(--text-2);border-style:dashed;pointer-events:none;}
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--ok);flex-shrink:0;}
+  .dot.pending{background:var(--pending);}
+  .dot.quiz{background:var(--holo-c);}
+  .round-link.quiz-done{border-color:var(--holo-c);color:var(--holo-c);}
+  footer{margin-top:40px;font-size:12px;color:var(--text-2);line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">김포대학교 · 경기공유학교 · 2026-2학기</div>
+  <h1>김포미래그린공유학교 지역맞춤형프로그램 2학기<br>회차별 학습한 결과 제출 및 확인</h1>
+  <div class="tagline">AI 디지털 리터러시 활용 자격 2급으로 미래를 열다</div>
+  <p class="sub">학생은 회차(일)별로 AI-Canvas 링크와 PPT를 제출하고, 제출결과를 조회할 수 있습니다.</p>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="submit">제출하기</button>
+    <button class="tab-btn" data-tab="result">결과 보기</button>
+  </div>
+
+  <!-- ── 제출 탭 ── -->
+  <div class="tab-panel active form-wrap" id="panel-submit">
+    <form id="submit-form">
+      <div class="field">
+        <label for="name">이름</label>
+        <select id="name" required>
+          <option value="" disabled selected>이름을 선택하세요</option>
+          <option>권승윤</option>
+          <option>이하홍</option>
+          <option>박혜빈</option>
+          <option>전예람</option>
+          <option>전보람</option>
+          <option>서인우</option>
+          <option>장현</option>
+          <option>이예찬</option>
+          <option>권준현</option>
+          <option>전미진</option>
+          <option>김인범</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="round">회차</label>
+        <select id="round" required>
+          <option value="" disabled selected>회차를 선택하세요</option>
+          <option value="1">1일차</option>
+          <option value="2">2일차</option>
+          <option value="3">3일차</option>
+          <option value="4">4일차</option>
+          <option value="5">5일차</option>
+          <option value="6">6일차</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" placeholder="개인 비밀번호를 입력하세요 (기본값: 전화번호)" required autocomplete="off">
+        <div class="pw-toggle" id="pw-toggle">비밀번호를 바꾸고 싶으신가요?</div>
+      </div>
+
+      <div class="pw-change" id="pw-change" style="display:none;">
+        <div class="field">
+          <label for="new-password">새 비밀번호</label>
+          <input type="password" id="new-password" placeholder="새 비밀번호를 입력하세요" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="new-password-confirm">새 비밀번호 확인</label>
+          <input type="password" id="new-password-confirm" placeholder="새 비밀번호를 다시 입력하세요" autocomplete="off">
+        </div>
+        <button type="button" id="pw-change-btn" class="secondary-btn">비밀번호 변경하기</button>
+      </div>
+
+      <div class="field">
+        <label for="canvas">AI-Canvas 링크</label>
+        <input type="url" id="canvas" placeholder="https://ai-canvas.io/project/...">
+      </div>
+
+      <div class="field">
+        <label>PPT 파일</label>
+        <div class="file-drop" id="drop-zone">
+          <div>클릭하거나 파일을 끌어다 놓으세요</div>
+          <div class="hint">.pptx / .ppt</div>
+          <div class="file-name" id="file-name"></div>
+          <input type="file" id="file-input" accept=".ppt,.pptx">
+        </div>
+      </div>
+
+      <button type="submit" id="submit-btn">제출하기</button>
+      <div id="submit-status"></div>
+    </form>
+  </div>
+
+  <!-- ── 결과 탭 ── -->
+  <div class="tab-panel" id="panel-result">
+    <div class="meta-row">
+      <button class="pill" id="refresh-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        최신 데이터 새로고침
+      </button>
+    </div>
+    <div id="result-status">시트에 저장된 기본 데이터로 표시 중 · 새로고침을 누르면 최신 상태로 갱신합니다.</div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <footer>
+    새 학생이 추가되면 스프레드시트에 행을 추가하고, 이 페이지의 이름 목록과 Apps Script의 폴더 매핑에도 반영해야 제출이 가능합니다.
+  </footer>
+</div>
+
+<script>
+// ── 탭 전환 ──
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab === 'result') refresh();
+  });
+});
+
+// 배포한 Apps Script 웹 앱 URL을 여기에 붙여넣으세요.
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz03aXo9iI11PzmiMkFner5vDoZLbI-u76yPsKyykGgGrLD6GSfXaUP32qEjg3iW63D/exec";
+const SHEET_ID = "1KRpyxKIcFpxU7NT0z7y12ShJfoY0XW6-jdsUPp2rCQQ";
+const ROUNDS = [1,2,3,4,5,6];
+
+// "2026-2 복습퀴즈 결과" 웹 앱 URL (퀴즈 세트 1/2/3 결과를 3/4/5일차에 표시하기 위해 사용)
+const QUIZ_RESULTS_URL = "https://script.google.com/macros/s/AKfycbwol00XXtQeu4qtSTMJZMsXsjn0mSE0wXirhWhYV8EFDrC1hquZMrrHfjU2GCs5se21/exec";
+// 퀴즈를 표시할 회차와, 각 회차가 어떤 퀴즈 "세트" 번호에 해당하는지 매핑
+const QUIZ_ROUNDS = [3, 4, 5];
+const ROUND_TO_QUIZ_SET = { 3: 1, 4: 2, 5: 3 };
+let quizResultsMap = {}; // { 학생이름: { 세트번호: {score, total} } } - 세트별 최고 점수
+
+// ── 제출 폼 로직 ──
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const fileNameEl = document.getElementById('file-name');
+let selectedFile = null;
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag');
+  if (e.dataTransfer.files.length) {
+    selectedFile = e.dataTransfer.files[0];
+    fileNameEl.textContent = selectedFile.name;
+  }
+});
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length) {
+    selectedFile = fileInput.files[0];
+    fileNameEl.textContent = selectedFile.name;
+  }
+});
+
+function fileToBase64(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function setSubmitStatus(text, type){
+  const el = document.getElementById('submit-status');
+  el.textContent = text;
+  el.className = 'show ' + type;
+}
+
+const pwToggle = document.getElementById('pw-toggle');
+const pwChange = document.getElementById('pw-change');
+pwToggle.addEventListener('click', () => {
+  const showing = pwChange.style.display !== 'none';
+  pwChange.style.display = showing ? 'none' : 'block';
+  pwToggle.textContent = showing ? '비밀번호를 바꾸고 싶으신가요?' : '비밀번호 변경 취소';
+});
+
+document.getElementById('pw-change-btn').addEventListener('click', async () => {
+  const name = document.getElementById('name').value;
+  const password = document.getElementById('password').value;
+  const newPassword = document.getElementById('new-password').value;
+  const newPasswordConfirm = document.getElementById('new-password-confirm').value;
+
+  if (!name) { setSubmitStatus('이름을 먼저 선택하세요.', 'err'); return; }
+  if (!password) { setSubmitStatus('현재 비밀번호를 입력하세요.', 'err'); return; }
+  if (!newPassword) { setSubmitStatus('새 비밀번호를 입력하세요.', 'err'); return; }
+  if (newPassword !== newPasswordConfirm) { setSubmitStatus('새 비밀번호가 서로 일치하지 않습니다.', 'err'); return; }
+  if (WEB_APP_URL.indexOf('http') !== 0) { setSubmitStatus('아직 웹 앱 URL이 설정되지 않았습니다.', 'err'); return; }
+
+  setSubmitStatus('비밀번호 변경 중입니다...', 'loading');
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'changePassword', name, password, newPassword })
+    });
+    const result = await res.json();
+    if (result.ok) {
+      setSubmitStatus('비밀번호가 변경되었습니다. 다음부터는 새 비밀번호로 제출하세요.', 'ok');
+      document.getElementById('password').value = newPassword;
+      document.getElementById('new-password').value = '';
+      document.getElementById('new-password-confirm').value = '';
+      pwChange.style.display = 'none';
+      pwToggle.textContent = '비밀번호를 바꾸고 싶으신가요?';
+    } else {
+      setSubmitStatus('비밀번호 변경 실패: ' + (result.error || '알 수 없는 오류'), 'err');
+    }
+  } catch (err) {
+    setSubmitStatus('비밀번호 변경 중 오류가 발생했습니다: ' + err.message, 'err');
+  }
+});
+
+document.getElementById('submit-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const round = document.getElementById('round').value;
+  const password = document.getElementById('password').value;
+  const canvasLink = document.getElementById('canvas').value.trim();
+  const btn = document.getElementById('submit-btn');
+
+  if (!name) { setSubmitStatus('이름을 선택하세요.', 'err'); return; }
+  if (!round) { setSubmitStatus('회차를 선택하세요.', 'err'); return; }
+  if (!password) { setSubmitStatus('비밀번호를 입력하세요.', 'err'); return; }
+  if (!canvasLink && !selectedFile) { setSubmitStatus('AI-Canvas 링크 또는 PPT 파일 중 하나는 입력해야 합니다.', 'err'); return; }
+  if (WEB_APP_URL.indexOf('http') !== 0) { setSubmitStatus('아직 웹 앱 URL이 설정되지 않았습니다. Apps Script 배포 후 상단의 WEB_APP_URL을 채워주세요.', 'err'); return; }
+
+  btn.disabled = true;
+  setSubmitStatus('제출 중입니다...', 'loading');
+
+  try {
+    const payload = { action: 'submit', name, round, password, canvasLink };
+    if (selectedFile) {
+      payload.fileBase64 = await fileToBase64(selectedFile);
+      payload.fileName = selectedFile.name;
+      payload.mimeType = selectedFile.type || 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    }
+
+    const res = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+
+    if (result.ok) {
+      setSubmitStatus('제출 완료되었습니다. ' + name + ' / ' + round + '일차', 'ok');
+      document.getElementById('submit-form').reset();
+      selectedFile = null;
+      fileNameEl.textContent = '';
+    } else {
+      setSubmitStatus('제출 실패: ' + (result.error || '알 수 없는 오류'), 'err');
+    }
+  } catch (err) {
+    setSubmitStatus('제출 중 오류가 발생했습니다: ' + err.message, 'err');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// ── 결과 조회 로직 ──
+const fallbackData = [
+  {no:1, name:"권승윤", school:"은여울중학교", rounds:{}},
+  {no:2, name:"이하홍", school:"통진고등학교", rounds:{}},
+  {no:3, name:"박혜빈", school:"운유고등학교", rounds:{}},
+  {no:4, name:"전예람", school:"푸른솔중학교", rounds:{}},
+  {no:5, name:"전보람", school:"김포제일고등학교", rounds:{}},
+  {no:6, name:"서인우", school:"마송고등학교", rounds:{}},
+  {no:7, name:"장현", school:"은여울중학교", rounds:{}},
+  {no:8, name:"이예찬", school:"경기영상과학고등학교", rounds:{}},
+  {no:9, name:"권준현", school:"하늘빛중학교", rounds:{}},
+  {no:10, name:"전미진", school:"하늘빛중학교", rounds:{}},
+  {no:11, name:"김인범", school:"김포대학교", rounds:{}}
+];
+
+function quizBadgeHtml(studentName, round){
+  if (QUIZ_ROUNDS.indexOf(round) === -1) return '';
+  const setNum = ROUND_TO_QUIZ_SET[round];
+  const rec = quizResultsMap[studentName] && quizResultsMap[studentName][setNum];
+  if (rec) {
+    return `<span class="round-link quiz-done" title="퀴즈 세트 ${setNum} 최고 점수"><span class="dot quiz"></span>Quiz ${rec.score}/${rec.total}</span>`;
+  }
+  return `<span class="round-link empty"><span class="dot pending"></span>Quiz 미응시</span>`;
+}
+
+function renderResults(data){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  data.forEach(s=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    const doneCount = ROUNDS.filter(r => s.rounds[r] && (s.rounds[r].canvas || s.rounds[r].ppt)).length;
+    const roundsHtml = ROUNDS.map(r=>{
+      const info = s.rounds[r] || {};
+      const canvas = info.canvas
+        ? `<a class="round-link" href="${info.canvas}" target="_blank" rel="noopener"><span class="dot"></span>Canvas</a>`
+        : `<span class="round-link empty"><span class="dot pending"></span>Canvas</span>`;
+      const ppt = info.ppt
+        ? `<a class="round-link" href="${info.ppt}" target="_blank" rel="noopener"><span class="dot"></span>PPT</a>`
+        : `<span class="round-link empty"><span class="dot pending"></span>PPT</span>`;
+      const quiz = quizBadgeHtml(s.name, r);
+      return `<div class="round-row"><span class="round-label">${r}일차</span>${canvas}${ppt}${quiz}</div>`;
+    }).join('');
+    card.innerHTML = `
+      <div class="num">No. ${String(s.no).padStart(2,'0')}</div>
+      <div class="name">${s.name}</div>
+      <div class="progress">${doneCount} / 6일차 제출</div>
+      <div class="rounds">${roundsHtml}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// 퀴즈 웹앱에서 전체 응시 기록을 받아와, 학생별/세트별 "최고 점수"만 남긴 맵으로 변환
+async function fetchQuizResultsMap(){
+  const map = {};
+  try {
+    if (QUIZ_RESULTS_URL.indexOf('http') !== 0) return map;
+    const res = await fetch(`${QUIZ_RESULTS_URL}?action=allResults`);
+    const data = await res.json();
+    if (!data.ok || !data.results) return map;
+
+    data.results.forEach(row => {
+      const name = String(row.name || '').trim();
+      const setMatch = String(row.set || '').match(/(\d+)/);
+      const score = Number(row.score);
+      const total = Number(row.total);
+      if (!name || !setMatch || isNaN(score) || isNaN(total)) return;
+
+      const setNum = parseInt(setMatch[1], 10);
+      if (!map[name]) map[name] = {};
+      const existing = map[name][setNum];
+      if (!existing || score > existing.score) {
+        map[name][setNum] = { score, total };
+      }
+    });
+  } catch (e) {
+    // 퀴즈 결과를 못 불러와도 주차별 작업 제출 현황 표시는 그대로 진행
+  }
+  return map;
+}
+
+async function refresh(){
+  const status = document.getElementById('result-status');
+  status.textContent = '구글 시트에서 최신 데이터를 불러오는 중...';
+
+  quizResultsMap = await fetchQuizResultsMap();
+
+  try{
+    if (WEB_APP_URL.indexOf('http') !== 0) throw new Error('WEB_APP_URL 미설정');
+    const res = await fetch(WEB_APP_URL);
+    const result = await res.json();
+    if(result.ok && result.students && result.students.length){
+      renderResults(result.students);
+      status.textContent = '구글 시트 데이터로 갱신되었습니다 (' + new Date().toLocaleTimeString('ko-KR') + ' 기준).';
+    } else {
+      throw new Error(result.error || 'empty');
+    }
+  }catch(e){
+    renderResults(fallbackData);
+    status.textContent = '구글 시트에 접근할 수 없어 기본 데이터로 표시 중입니다 (Apps Script가 최신 코드로 재배포되었는지 확인해보세요).';
+  }
+}
+
+document.getElementById('refresh-btn').addEventListener('click', refresh);
+renderResults(fallbackData);
+</script>
+</body>
+</html>
